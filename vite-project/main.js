@@ -53,7 +53,7 @@ const mouse = new THREE.Vector2()
 function animate() {
     requestAnimationFrame(animate)
 
-    sphere.rotation.y += 0.003
+    sphere.rotation.y += 0.0015
 
     controls.update()
 
