@@ -80,6 +80,7 @@ function calcLatLonFromPos(x, y, z) {
     let lon = Math.atan2(x, z) * (180 / Math.PI);
     return [lat, lon];
 }
+
 DOMSelectors.form.addEventListener('submit', function (event) {
     event.preventDefault()
     const a = DOMSelectors.location.value
