@@ -47,9 +47,6 @@ scene.add(pointLight)
 const controls = new OrbitControls(camera, renderer.domElement)
 controls.enableDamping = true
 
-const raycaster = new THREE.Raycaster()
-const mouse = new THREE.Vector2()
-
 function animate() {
     requestAnimationFrame(animate)
 
@@ -62,44 +59,35 @@ function animate() {
 
 animate()
 
-window.addEventListener('click', onClick)
+const raycaster = new THREE.Raycaster()
+const mouse = new THREE.Vector2()
 
-function onClick(event) {
-    mouse.x = (event.clientX / sizes.width) * 2 - 1;
-    mouse.y = -(event.clientY / sizes.height) * 2 + 1;
-
+window.addEventListener('click', (event) => {
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
     raycaster.setFromCamera(mouse, camera);
     const intersects = raycaster.intersectObject(sphere);
-
     if (intersects.length > 0) {
-        const worldCoords = sphere.position.clone().applyMatrix4(sphere.matrixWorld);
-
-        // Use a library like proj4 for accurate conversion
-        const geographicCoords = proj4('<your_projection_from>', '<your_projection_to>', [worldCoords.x, worldCoords.y]);
-
-        // The resulting geographicCoords array will contain latitude and longitude
-        const latitude = geographicCoords[1];
-        const longitude = geographicCoords[0];
-
-        console.log('Latitude:', latitude, 'Longitude:', longitude);
-
-        const api = `https://api.tomorrow.io/v4/weather/realtime?location=${latitude},${longitude}&apikey=iU0uqAKQxxH8mqAh1YJojL7oWqCDVPL1`
-
-        // Update the form submit event listener outside the click event
-        DOMSelectors.form.addEventListener('submit', function (event) {
-            event.preventDefault()
-            const a = DOMSelectors.location.value
-
-            const api = `https://api.tomorrow.io/v4/weather/realtime?location=${a}&apikey=iU0uqAKQxxH8mqAh1YJojL7oWqCDVPL1`
-            getData(api)
-        })
-
-        // Call getData with the new API inside the click event
-        getData(api)
+        let pointOnSphere = intersects[0].point;
+        let latLon = calcLatLonFromPos(pointOnSphere.x, pointOnSphere.y, pointOnSphere.z);
+        console.log(`Latitude: ${latLon[0]}, Longitude: ${latLon[1]}`);
     }
-}
+});
 
-// Move the getData function outside of the click event listener
+function calcLatLonFromPos(x, y, z) {
+    let radius = Math.sqrt(x * x + y * y + z * z);
+    let lat = 90 - (Math.acos(y / radius)) * (180 / Math.PI);
+    let lon = Math.atan2(x, z) * (180 / Math.PI);
+    return [lat, lon];
+}
+DOMSelectors.form.addEventListener('submit', function (event) {
+    event.preventDefault()
+    const a = DOMSelectors.location.value
+
+    const api = `https://api.tomorrow.io/v4/weather/realtime?location=${a}&apikey=iU0uqAKQxxH8mqAh1YJojL7oWqCDVPL1`
+    getData(api)
+})
+
 async function getData(api) {
     try {
         console.log(api)

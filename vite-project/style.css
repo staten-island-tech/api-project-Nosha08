@@ -106,3 +106,12 @@ canvas {
   top: 0;
   left: 0;
 }
+
+form {
+  z-index: 1;
+  color: white;
+}
+
+#bg {
+  z-index: -1;
+}
