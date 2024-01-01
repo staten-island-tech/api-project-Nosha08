@@ -2,6 +2,7 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 import proj4 from 'proj4'
+import ThreeGlobe from 'three-globe'
 
 const DOMSelectors = {
     form: document.querySelector('.form'),
@@ -47,49 +48,50 @@ scene.add(pointLight)
 const controls = new OrbitControls(camera, renderer.domElement)
 controls.enableDamping = true
 
+let rotation = 0
+
 function animate() {
     requestAnimationFrame(animate)
-
     sphere.rotation.y += 0.0015
-
+    rotation += 0.0015
     controls.update()
-
     renderer.render(scene, camera)
 }
 
 animate()
 
-const raycaster = new THREE.Raycaster()
-const mouse = new THREE.Vector2()
+let raycaster = new THREE.Raycaster();
+let mouse = new THREE.Vector2();
+let radius = 5
 
-window.addEventListener('click', (event) => {
+function onMouseClick(event) {
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
     raycaster.setFromCamera(mouse, camera);
-    const intersects = raycaster.intersectObject(sphere);
-    if (intersects.length > 0) {
-        let pointOnSphere = intersects[0].point;
-        let latLon = calcLatLonFromPos(pointOnSphere.x, pointOnSphere.y, pointOnSphere.z);
-        console.log(`Latitude: ${latLon[0]}, Longitude: ${latLon[1]}`);
-    }
-});
+    let intersects = raycaster.intersectObjects(scene.children);
 
-function calcLatLonFromPos(x, y, z) {
-    let radius = Math.sqrt(x * x + y * y + z * z);
-    let lat = 90 - (Math.acos(y / radius)) * (180 / Math.PI);
-    let lon = Math.atan2(x, z) * (180 / Math.PI);
-    return [lat, lon];
+    for (let i = 0; i < intersects.length; i++) {
+        let point = intersects[i].point;
+        let lat = THREE.MathUtils.radToDeg(Math.asin(point.y / radius));
+        let lon = THREE.MathUtils.radToDeg(Math.atan2(point.z, point.x) + rotation);
+        lon = ((lon + 180) % 360 - 180) * -1
+        console.log(`Latitude: ${lat}, Longitude: ${lon}`);
+        a(lat, lon)
+    }
 }
 
-DOMSelectors.form.addEventListener('submit', function (event) {
-    event.preventDefault()
-    const a = DOMSelectors.location.value
+window.addEventListener('click', onMouseClick, false);
 
-    const api = `https://api.tomorrow.io/v4/weather/realtime?location=${a}&apikey=iU0uqAKQxxH8mqAh1YJojL7oWqCDVPL1`
-    getData(api)
-})
+async function a(lat, lon) {
+    const locAPI = `https://api.geoapify.com/v1/geocode/reverse?lat=${lat}&lon=${lon}&apiKey=ef328f1da2a74f7da516384ae28cf9fd`
+    const response = await fetch(locAPI)
+    const data = await response.json()
+    const location = data.features[0].properties.formatted
+    const api = `https://api.tomorrow.io/v4/weather/realtime?location=${location}&apikey=iU0uqAKQxxH8mqAh1YJojL7oWqCDVPL1`
+    getData(api, location)
+}
 
-async function getData(api) {
+async function getData(api, location) {
     try {
         console.log(api)
         const response = await fetch(api)
@@ -97,7 +99,7 @@ async function getData(api) {
         console.log(data)
         DOMSelectors.container.insertAdjacentHTML('beforeend', `
             <div class="card">
-                <h1>${data.location.name}</h1>
+                <h1>${location}</h1>
                 <h2>${data.data.values.temperature}</h2>
             </div>`)
     } catch (error) {
