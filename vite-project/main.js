@@ -134,7 +134,7 @@ async function getData(api, location) {
         } else if (snow > 0) {
             snow = 'Snowy'
         } else {
-            precipitation = 'No Precipiation'
+            precipitation = 'No Precipitation'
         }
         
         DOMSelectors.container.innerHTML = ''
@@ -147,6 +147,7 @@ async function getData(api, location) {
             </div>`)
     } catch (error) {
         console.log(error)
+        //alert(error)
     }
 }
 
