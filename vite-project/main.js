@@ -2,7 +2,6 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 import proj4 from 'proj4'
-import ThreeGlobe from 'three-globe'
 
 const DOMSelectors = {
     form: document.querySelector('.form'),
