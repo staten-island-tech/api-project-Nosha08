@@ -63,10 +63,9 @@ if ("geolocation" in navigator) {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const lat = position.coords.latitude;
-        const lng = position.coords.longitude;
-  
-        console.log(`Latitude: ${lat}, longitude: ${lng}`);
-        a(lat, lng)
+        const lon = position.coords.longitude;
+        console.log(`Latitude: ${lat}, longitude: ${lon}`);
+        a(lat, lon)
       },
       (error) => {
         console.error("Error getting user location:", error);
@@ -107,19 +106,50 @@ async function a(lat, lon) {
     getData(api, location)
 }
 
+//CREATE MORE FUNCTIONS
 async function getData(api, location) {
     try {
         console.log(api)
         const response = await fetch(api)
         const data = await response.json()
         console.log(data)
+        process(data)
+
+        let temperature = data.data.values.temperature * 9/5 + 32
+
+        let clouds = data.data.values.cloudCover
+        if (clouds <= 15 ) {
+            clouds = 'Sunny'
+        } else if (clouds > 15 && clouds < 55) {
+            clouds = 'Partly Cloudy'
+        } else {
+            clouds = 'Cloudy'
+        }
+
+        let rain = data.data.values.rainIntensity
+        let snow = data.data.values.snowIntensity
+        let precipitation = null
+        if (rain > 0) {
+            rain = 'Rainy'
+        } else if (snow > 0) {
+            snow = 'Snowy'
+        } else {
+            precipitation = 'No Precipiation'
+        }
+        
         DOMSelectors.container.innerHTML = ''
         DOMSelectors.container.insertAdjacentHTML('beforeend', `
             <div class="card">
                 <h1>${location}</h1>
-                <h2>${data.data.values.temperature}</h2>
+                <h2>${clouds}</h2>
+                <h2>${precipitation}</h2>
+                <h2>${temperature}°F</h2>
             </div>`)
     } catch (error) {
         console.log(error)
     }
+}
+
+function process(data) {
+
 }
