@@ -1,14 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500&family=Roboto+Condensed&family=Roboto:wght@100&display=swap');
 :root {
-  --light-blue: rgb(138, 187, 216);
-  --dark-blue: rgb(106, 188, 235);
-  --yellow: rgb(230, 222, 114);
   --white: #fff8e8;
   --purple: #4d3a85;
   --dark-purple: #25174d;
-
   --button-text: 18px;
-
   --font: 'Roboto Condensed', sans-serif;
 
 }
@@ -19,12 +14,6 @@
 
 body {
   background-color: var(--primary);
-}
-
-.vacation {
-  --primary: var(--yellow);
-  --secondary: var(--light-blue);
-  --tertiary: var(--dark-blue);
 }
 
 .professional {
@@ -54,7 +43,7 @@ body {
   margin: 20px;
   padding: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
-  color: rgb(53, 49, 49);
+  color: rgb(255, 255, 255);
   opacity: 0;
   animation: fadeIn 0.8s ease-in-out forwards;
   transition: background-color 0.3s ease-in-out;
@@ -66,9 +55,9 @@ body {
   object-fit: cover;
 }
 
-.card:hover {
+/* .card:hover {
   background-color: var(--tertiary);
-}
+} */
 
 button {
   background-color: var(--secondary);
