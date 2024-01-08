@@ -107,6 +107,9 @@ async function a(lat, lon) {
 }
 
 //CREATE MORE FUNCTIONS
+
+//flexbox rem window size change
+
 async function getData(api, location) {
     try {
         console.log(api)
